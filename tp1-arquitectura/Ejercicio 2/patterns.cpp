@@ -99,7 +99,7 @@ int main()
 
     timeval time1, time2;
     gettimeofday(&time1, NULL);
-    singleThreadPM(patterns, textLine);
+    multiThreadPM(patterns, textLine);
     gettimeofday(&time2, NULL);
     cout << "Tiempo ejecución: " << double(time2.tv_sec - time1.tv_sec) + double(time2.tv_usec - time1.tv_usec) / 1000000 << endl;
 
