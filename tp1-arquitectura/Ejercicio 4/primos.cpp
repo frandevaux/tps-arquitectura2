@@ -6,11 +6,11 @@
 
 using namespace std;
 
-const int n = 1000000;
+const int n = 10000000;
 const int raizN = ceil(sqrt(n));
-const int t = 2;
+const int t = 10;
 vector<int> primosRaizN;
-vector<int> primosTotal;
+vector<int> primosTotal[t+1];
 
 bool esPrimo(int numero)
 {
@@ -70,13 +70,13 @@ bool isPrimeMT(int i)
     return true;
 }
 
-void calculatePrimesMT(int start, int end)
+void calculatePrimesMT(int tNumber,int start, int end)
 {
     for (int i = start; i < end; i++)
     {
         if (isPrimeMT(i))
         {
-            primosTotal.push_back(i);
+            primosTotal[tNumber].push_back(i);
         }
     }
 }
@@ -87,7 +87,7 @@ void multiThread()
 
     for (int i = 0; i < primosRaizN.size(); i++)
     {
-        primosTotal.push_back(primosRaizN[i]);
+        primosTotal[0].push_back(primosRaizN[i]);
     }
 
     int fraction = (n - raizN) / t;
@@ -98,7 +98,7 @@ void multiThread()
     {
         int start = raizN + i * fraction;
         int end = raizN + (i + 1) * fraction;
-        thread_array[i] = thread(calculatePrimesMT, start, end);
+        thread_array[i] = thread(calculatePrimesMT, i+1, start, end);
     }
 
     for (int i = 0; i < t; i++)
@@ -109,15 +109,25 @@ void multiThread()
         }
     }
 
-    // sort primosTotal
-    sort(primosTotal.begin(), primosTotal.end());
-
-    for (int i = primosTotal.size() - 1; i >= primosTotal.size() - 5; i--)
+    // Get All Prime appeding from all threads
+    vector<int> allPrimeNumbers;
+    for (int i = 0; i < t+1; i++)
     {
-        cout << primosTotal[i] << endl;
+        for (int j = 0; j < primosTotal[i].size(); j++)
+        {
+            allPrimeNumbers.push_back(primosTotal[i][j]);
+        }
     }
 
-    cout << primosTotal.size() << endl;
+    // sort primosTotal
+    sort(allPrimeNumbers.begin(), allPrimeNumbers.end());
+
+    for (int i = allPrimeNumbers.size() - 1; i >= allPrimeNumbers.size() - 5; i--)
+    {
+        cout << allPrimeNumbers[i] << endl;
+    }
+
+    cout << "Número total: " <<allPrimeNumbers.size() << endl;
 }
 
 int main()
