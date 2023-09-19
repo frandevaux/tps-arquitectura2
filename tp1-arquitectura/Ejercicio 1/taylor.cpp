@@ -29,11 +29,8 @@ void calculate_term_thread(int x, int start, int end)
     result_multithread += thread_total;
 }
 
-long double taylor_single_thread()
+long double taylor_single_thread(int x)
 {
-    int x;
-    cout << "Ingrese un número entero positivo: ";
-    cin >> x;
     long double result_single_thread = 0;
     for (int i = 0; i <= 10000000; i++)
     {
@@ -43,6 +40,7 @@ long double taylor_single_thread()
     cout << "El resultado es:" << result_single_thread << endl;
     return 1;
 };
+
 long double taylor_multithread(int x, int t)
 {
 
@@ -70,17 +68,25 @@ long double taylor_multithread(int x, int t)
 
 int main()
 {
-
     int x;
     cout << "Ingrese un número entero positivo: ";
     cin >> x;
     int t;
     cout << "Ingrese la cantidad de hilos deseados: ";
     cin >> t;
-    timeval time1, time2;
+    
+    timeval time1, time2, time3;
     gettimeofday(&time1, NULL);
-    taylor_multithread(x, t);
+
+    cout << "\n Ejecutando Taylor con un hilo" << endl;
+    taylor_single_thread(x);
     gettimeofday(&time2, NULL);
     cout << "Tiempo ejecución: " << double(time2.tv_sec - time1.tv_sec) + double(time2.tv_usec - time1.tv_usec) / 1000000 << endl;
+
+    cout << "\n Ejecutando Taylor con " << t << " hilos" << endl;
+    taylor_multithread(x, t);
+    gettimeofday(&time3, NULL);
+    cout << "Tiempo ejecución: " << double(time3.tv_sec - time2.tv_sec) + double(time3.tv_usec - time2.tv_usec) / 1000000 << endl;
+
     return 0;
 }
