@@ -3,6 +3,7 @@
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -132,7 +133,18 @@ void multiThread()
 
 int main()
 {
+    timeval time1, time2, time3;
+    gettimeofday(&time1, NULL);
+
+    cout << "Buscando primos de 1 a " << n << " con un hilo" << endl;
+    singleThread();
+    gettimeofday(&time2, NULL);
+    cout << "Tiempo de ejecución: " << (time2.tv_sec - time1.tv_sec) * 1000000 + time2.tv_usec - time1.tv_usec << " microsegundos" << endl;
+
+    cout << "\nBuscando primos de 1 a " << n << " con " << t << " hilos" << endl;
     multiThread();
+    gettimeofday(&time3, NULL);
+    cout << "Tiempo de ejecución: " << (time3.tv_sec - time2.tv_sec) * 1000000 + time3.tv_usec - time2.tv_usec << " microsegundos" << endl;
 
     return 0;
 }
