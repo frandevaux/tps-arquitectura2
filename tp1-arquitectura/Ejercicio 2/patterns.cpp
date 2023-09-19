@@ -70,8 +70,9 @@ void multiThreadPM(string patterns[], string text)
 }
 int main()
 {
+    
     string line;
-    ifstream patternFile("patrones.txt");
+    ifstream patternFile("./patrones.txt");
     string patterns[32];
     if (patternFile.is_open())
     {
@@ -83,25 +84,36 @@ int main()
         }
         patternFile.close();
     }
-    else
-        cout << "Unable to open file";
+    else {
+        cout << "Unable to open file" << endl;
+        return 0;
+    }
 
     string textLine;
-    ifstream textFile("texto.txt");
+    ifstream textFile("./texto.txt");
 
     if (textFile.is_open())
     {
         getline(textFile, textLine);
         textFile.close();
+    } 
+    else {
+        cout << "Unable to open file" << endl;
+        return 0;
     }
-    else
-        cout << "Unable to open file";
-
-    timeval time1, time2;
+    
+    timeval time1, time2, time3;
     gettimeofday(&time1, NULL);
-    multiThreadPM(patterns, textLine);
+
+    cout << "\nBuscando patrones con un hilo" << endl;
+    singleThreadPM(patterns, textLine);
     gettimeofday(&time2, NULL);
     cout << "Tiempo ejecución: " << double(time2.tv_sec - time1.tv_sec) + double(time2.tv_usec - time1.tv_usec) / 1000000 << endl;
+
+    cout << "\nBuscando patrones con 32 hilos" << endl;
+    multiThreadPM(patterns, textLine);
+    gettimeofday(&time3, NULL);
+    cout << "Tiempo ejecución: " << double(time3.tv_sec - time2.tv_sec) + double(time3.tv_usec - time2.tv_usec) / 1000000 << endl;
 
     return 0;
 }
