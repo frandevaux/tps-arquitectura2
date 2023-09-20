@@ -139,12 +139,12 @@ int main()
     cout << "Buscando primos de 1 a " << n << " con un hilo" << endl;
     singleThread();
     gettimeofday(&time2, NULL);
-    cout << "Tiempo de ejecución: " << (time2.tv_sec - time1.tv_sec) * 1000000 + time2.tv_usec - time1.tv_usec << " microsegundos" << endl;
+    cout << "Tiempo ejecución: " << double(time2.tv_sec - time1.tv_sec) + double(time2.tv_usec - time1.tv_usec) / 1000000 << endl;
 
     cout << "\nBuscando primos de 1 a " << n << " con " << t << " hilos" << endl;
     multiThread();
     gettimeofday(&time3, NULL);
-    cout << "Tiempo de ejecución: " << (time3.tv_sec - time2.tv_sec) * 1000000 + time3.tv_usec - time2.tv_usec << " microsegundos" << endl;
+    cout << "Tiempo ejecución: " << double(time3.tv_sec - time2.tv_sec) + double(time3.tv_usec - time2.tv_usec) / 1000000 << endl;
 
     return 0;
 }

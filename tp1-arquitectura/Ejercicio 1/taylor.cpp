@@ -86,6 +86,7 @@ int main()
     cout << "\n Ejecutando Taylor con " << t << " hilos" << endl;
     taylor_multithread(x, t);
     gettimeofday(&time3, NULL);
+
     cout << "Tiempo ejecución: " << double(time3.tv_sec - time2.tv_sec) + double(time3.tv_usec - time2.tv_usec) / 1000000 << endl;
 
     return 0;
