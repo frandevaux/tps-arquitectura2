@@ -34,9 +34,7 @@ long double calculate_term_process(int x, int start, int end)
 
 int main()
 {
-    int x;
-    cout << "Ingrese un número entero positivo: ";
-    cin >> x;
+    int x = 1500000;
 
 
 
@@ -66,7 +64,7 @@ int main()
     MPI_Reduce(&local_result, &global_result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     // Print Result
-    cout << "El resultado es:" << global_result << endl;
+    cout << "El resultado es:" << 2 * global_result << endl;
 
     // Close MPI
     if(MPI_SUCCESS != MPI_Finalize())
