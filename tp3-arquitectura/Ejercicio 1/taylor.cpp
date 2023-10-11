@@ -21,12 +21,14 @@ long double calculate_single_term(int n, int x)
 
 long double calculate_term_process(int x, int start, int end)
 {
-    long double process_total = 0;
+    long double process_total = 0.0;
     for (int i = start; i < end; i++)
     {
         process_total += calculate_single_term(i, x);
     }
+    cout << "El resultado parcial es:" <<  process_total << endl;
     return process_total;
+
 }
 
 
@@ -64,7 +66,10 @@ int main()
     MPI_Reduce(&local_result, &global_result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     // Print Result
-    cout << "El resultado es:" << 2.0 * global_result << endl;
+    if (rank == 0){
+        cout << "El resultado es:" << 2.0 * global_result << endl;
+    }
+
 
     // Close MPI
     if(MPI_SUCCESS != MPI_Finalize())
