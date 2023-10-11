@@ -63,8 +63,12 @@ int main()
     long double local_result = calculate_term_process(x, rank * fraction_number, (rank + 1) * fraction_number);
 
     // Sum all results
-    MPI_Reduce(&local_result, &global_result, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&local_result, &global_result, 1, MPI_LONG_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
+    // Print Result
+    if (rank == 0){
+        cout << "El resultado es:" << 2.0 * global_result << endl;
+    }
 
 
     // Close MPI
@@ -74,7 +78,6 @@ int main()
         exit(1);
     }
 
-    cout << "El resultado es:" << 2.0 * global_result << endl;
 
     return 0;
 }
