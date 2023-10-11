@@ -55,7 +55,7 @@ int main()
 
     // Init vars
     int fraction_number = 10000000 / size;
-    long double global_result = 0;
+    long double global_result = 0.0;
 
     // Calculate
     long double local_result = calculate_term_process(rank, rank * fraction_number, (rank + 1) * fraction_number);
@@ -64,7 +64,7 @@ int main()
     MPI_Reduce(&local_result, &global_result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     // Print Result
-    cout << "El resultado es:" << 2 * global_result << endl;
+    cout << "El resultado es:" << 2.0 * global_result << endl;
 
     // Close MPI
     if(MPI_SUCCESS != MPI_Finalize())
