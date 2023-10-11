@@ -60,7 +60,7 @@ int main()
     long double global_result = 0.0;
 
     // Calculate
-    long double local_result = calculate_term_process(rank, rank * fraction_number, (rank + 1) * fraction_number);
+    long double local_result = calculate_term_process(x, rank * fraction_number, (rank + 1) * fraction_number);
 
     // Sum all results
     MPI_Reduce(&local_result, &global_result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
