@@ -29,7 +29,7 @@ int main (){
     gethostname(hostname, sizeof(hostname));
 
 
-    cout << "Hola Mundo! soy el proceso " << proceso_id << " de "<< rank << " corriendo en la máquina "<< hostname << " IP= "<< ip << endl;
+    cout << "Hola Mundo! soy el proceso " << proceso_id << " de "<< size << " corriendo en la máquina "<< hostname << " IP= "<< ip << endl;
 
     if(MPI_SUCCESS != MPI_Finalize())
     {
