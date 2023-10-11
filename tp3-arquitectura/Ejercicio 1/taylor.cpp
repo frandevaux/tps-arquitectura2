@@ -65,10 +65,6 @@ int main()
     // Sum all results
     MPI_Reduce(&local_result, &global_result, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    // Print Result
-    if (rank == 0){
-        cout << "El resultado es:" << 2.0 * global_result << endl;
-    }
 
 
     // Close MPI
@@ -77,7 +73,7 @@ int main()
         cout << "Error finalizing MPI" << endl;
         exit(1);
     }
-
+    cout << "El resultado es:" << 2.0 * global_result << endl;
 
     return 0;
 }
