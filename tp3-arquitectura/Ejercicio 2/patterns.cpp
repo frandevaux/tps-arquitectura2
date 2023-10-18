@@ -48,7 +48,7 @@ void multiProcessPM(string patterns[], string text, int start, int end, vector<t
     {
         int patternMatches = patternMatching(patterns[i], text);
         globalResults.push_back(make_tuple(i, patternMatches));
-        MPI_BARRIER(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 
 }
