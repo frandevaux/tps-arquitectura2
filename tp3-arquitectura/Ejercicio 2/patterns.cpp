@@ -41,16 +41,15 @@ int patternMatching(string pattern, string text)
 
 
 
-void multiProcessPM(string patterns[], string text, int start, int end, vector<tuple<int, int>> globalResults)
+vector<int> multiProcessPM(string patterns[], string text, int start, int end)
 {
-    vector<tuple<int, int>> patternResults;
+    vector<int> patternResults;
     for (int i = start; i < end; i++)
     {
         int patternMatches = patternMatching(patterns[i], text);
-        globalResults.push_back(make_tuple(i, patternMatches));
-        MPI_Barrier(MPI_COMM_WORLD);
+        patternResults.push_back(patternMatches);
     }
-
+    return patternResults;
 }
 
 int main()
@@ -103,18 +102,24 @@ int main()
         return 0;
     }
 
-    vector<tuple<int, int>> globalResults(32);
-    multiProcessPM(patterns, textLine, rank * fraction_number, (rank + 1) * fraction_number, globalResults);
+    int localPattern =  patternMatching(patterns[rank], textLine);
 
+    // Send 
+    MPI_Send(&localPattern, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 
+    // Receive
     if (rank == 0)
-    {
-        MPI_Barrier(MPI_COMM_WORLD);
-        for (int i = 0; i < 32; i++)
+    {   
+        int Mpresult;
+        for (int i=0; i<size; i++)
         {
-            cout << "El patrón " << patterns[i] << " aparece " << get<1>(globalResults[i]) << " veces" << endl;
+            
+            MPI_Recv(&Mpresult, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            cout << "El patron " << i << " se encontró " << Mpresult << " veces." << endl;
         }
+        
     }
+
     // Close MPI
     if(MPI_SUCCESS != MPI_Finalize())
     {
