@@ -109,6 +109,7 @@ int main()
     // Solve rows
     int i = rank;
     calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
+    printResult(matrixC);
 
     // Sum all matrices
     vector<vector<float>> globa_matrix ;
