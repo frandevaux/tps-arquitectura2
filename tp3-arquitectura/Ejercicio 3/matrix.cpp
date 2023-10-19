@@ -25,14 +25,15 @@ void imprimirMatriz(const vector<vector<float>> &matriz)
 
 
 
-vector<vector<float>> calculateRows(int start, int end, vector<vector<float>> matrixA, vector<vector<float>> matrixB) {
+float* calculateRows(int start, int end, vector<vector<float>> matrixA, vector<vector<float>> matrixB) {
     int n = matrixA.size();
-    vector<vector<float>> matrixC(end - start, vector<float>(n, 0.0));
+    int size = end - start;
+    float* matrixC = new float[size*n];
 
     for (int i = start; i < end; i++) {
         for (int j = 0; j < n; j++) {
             for (int k = 0; k < n; k++) {
-                matrixC[i - start][j] += matrixA[i][k] * matrixB[k][j];
+                matrixC[(i-start)*n + j] += matrixA[i][k] * matrixB[k][j];
             }
         }
     }
@@ -104,14 +105,14 @@ int main()
     // Solve rows
     int i = rank;
 
-    vector<vector<float>> matrixC =  calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
+    float* matrixC =  calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
     // printResult(matrixC);
 
     // Initialize global matrix with the same dimensions as matrixC
     float* global_matrix = new float[n*n];
 
     // Gather
-    MPI_Gather(&matrixC[0][0], fraction_number*n, MPI_FLOAT, global_matrix, fraction_number*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    MPI_Gather(matrixC, fraction_number*n, MPI_FLOAT, global_matrix, fraction_number*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
     // Print result
     if (rank == 0){
