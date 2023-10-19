@@ -6,7 +6,7 @@
 
 using namespace std;
 
-const int n = 1000;
+const int n = 300;
 const int t = 10;
 
 // matrixC
@@ -109,15 +109,33 @@ int main()
     // Solve rows
     int i = rank;
     calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
-    printResult(matrixC);
+    // printResult(matrixC);
 
-    // Sum all matrices
-    vector<vector<float>> globa_matrix ;
-    MPI_Reduce(&matrixC, &globa_matrix, n*n, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    // Initialize global matrix with the same dimensions as matrixC
+    float* global_matrix = new float[n*n];
+
+
+    MPI_Reduce(&matrixC[0][0], global_matrix, n*n, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
 
     // Print result
     if (rank == 0){
-        printResult(globa_matrix);
+        // Convert global matrix to vector
+        vector<vector<float>> global_matrix_vector(n, vector<float>(n));
+        for (int i = 0; i < n*n; i++)
+        {
+            global_matrix_vector[i/n][i%n] = global_matrix[i];
+        }
+
+        printResult(global_matrix_vector);
+    }
+
+    delete[] global_matrix;
+
+    // Close MPI
+    if(MPI_SUCCESS != MPI_Finalize())
+    {
+        cout << "Error finalizing MPI" << endl;
+        exit(1);
     }
 
     return 0;
