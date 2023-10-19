@@ -6,11 +6,10 @@
 
 using namespace std;
 
-const int n = 300;
+const int n = 40;
 const int t = 10;
 
-// matrixC
-vector<vector<float>> matrixC(n, vector<float>(n));
+
 
 void imprimirMatriz(const vector<vector<float>> &matriz)
 {
@@ -24,25 +23,21 @@ void imprimirMatriz(const vector<vector<float>> &matriz)
     }
 }
 
-void calculateCell(int i, int j, const vector<vector<float>> &matrixA, const vector<vector<float>> &matrixB)
-{
-    float result = 0;
-    for (int k = 0; k < n; k++)
-    {
-        result += matrixA[i][k] * matrixB[k][j];
-    }
-    matrixC[i][j] = result;
-}
 
-void calculateRows(int start, int end, const vector<vector<float>> &matrixA, const vector<vector<float>> &matrixB)
-{
-    for (int i = start; i < end; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
-            calculateCell(i, j, matrixA, matrixB);
+
+vector<vector<float>> calculateRows(int start, int end, vector<vector<float>> matrixA, vector<vector<float>> matrixB) {
+    int n = matrixA.size();
+    vector<vector<float>> matrixC(end - start, vector<float>(n, 0.0));
+
+    for (int i = start; i < end; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int k = 0; k < n; k++) {
+                matrixC[i - start][j] += matrixA[i][k] * matrixB[k][j];
+            }
         }
     }
+
+    return matrixC;
 }
 
 void printResult(const vector<vector<float>> &matrix) {
@@ -108,24 +103,27 @@ int main()
     
     // Solve rows
     int i = rank;
-    calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
+
+    vector<vector<float>> matrixC =  calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
     // printResult(matrixC);
 
     // Initialize global matrix with the same dimensions as matrixC
     float* global_matrix = new float[n*n];
 
-
-    MPI_Reduce(&matrixC[0][0], global_matrix, n*n, MPI_FLOAT, MPI_SUM, 0, MPI_COMM_WORLD);
+    // Gather
+    MPI_Gather(&matrixC[0][0], fraction_number*n, MPI_FLOAT, global_matrix, fraction_number*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
     // Print result
     if (rank == 0){
         // Convert global matrix to vector
+        float sum = 0.0;
         vector<vector<float>> global_matrix_vector(n, vector<float>(n));
         for (int i = 0; i < n*n; i++)
         {
+            sum += global_matrix[i];
             global_matrix_vector[i/n][i%n] = global_matrix[i];
         }
-
+        cout << "La suma de los elementos de la matriz es " << sum << endl;
         printResult(global_matrix_vector);
     }
 
