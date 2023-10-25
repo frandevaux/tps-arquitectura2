@@ -85,6 +85,10 @@ int main()
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+    // start timer
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
+
     const int n = 10000000;
     const int raizN = ceil(sqrt(n));
     int fraction_number = (n - raizN) / (size - 1);
@@ -179,6 +183,9 @@ int main()
         {
             cout << primosTotal[i] << " ";
         }
+        // print execution time
+        gettimeofday(&end, NULL);
+        cout << "Tiempo ejecución: " << double(end.tv_sec - start.tv_sec) + double(end.tv_usec - start.tv_usec) / 1000000 << endl;
     }
 
     if (MPI_SUCCESS != MPI_Finalize())

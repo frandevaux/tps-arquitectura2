@@ -9,8 +9,6 @@
 
 using namespace std;
 
-
-
 int patternMatching(string pattern, string text)
 {
 
@@ -39,8 +37,6 @@ int patternMatching(string pattern, string text)
     return count;
 }
 
-
-
 vector<int> multiProcessPM(string patterns[], string text, int start, int end)
 {
     vector<int> patternResults;
@@ -64,10 +60,12 @@ int main()
     int rank;
     int size;
 
-
-
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    // start timer
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
 
     int fraction_number = 32 / size;
 
@@ -84,7 +82,8 @@ int main()
         }
         patternFile.close();
     }
-    else {
+    else
+    {
         cout << "Unable to open file" << endl;
         return 0;
     }
@@ -97,37 +96,42 @@ int main()
         getline(textFile, textLine);
         textFile.close();
     }
-    else {
+    else
+    {
         cout << "Unable to open file" << endl;
         return 0;
     }
 
-    int localPattern =  patternMatching(patterns[rank], textLine);
+    int localPattern = patternMatching(patterns[rank], textLine);
 
-    // Send 
+    // Send
     MPI_Send(&localPattern, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
 
     // Receive
     if (rank == 0)
-    {   
+    {
         int Mpresult;
-        for (int i=0; i<size; i++)
+        for (int i = 0; i < size; i++)
         {
-            
+
             MPI_Recv(&Mpresult, 1, MPI_INT, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             cout << "El patron " << i << " se encontró " << Mpresult << " veces." << endl;
         }
-        
+    }
+
+    // print execution time
+    if (rank == 0)
+    {
+        gettimeofday(&end, NULL);
+        cout << "Tiempo ejecución: " << double(end.tv_sec - start.tv_sec) + double(end.tv_usec - start.tv_usec) / 1000000 << endl;
     }
 
     // Close MPI
-    if(MPI_SUCCESS != MPI_Finalize())
+    if (MPI_SUCCESS != MPI_Finalize())
     {
         cout << "Error finalizing MPI" << endl;
         exit(1);
     }
 
-
     return 0;
-
 }

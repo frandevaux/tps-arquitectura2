@@ -16,7 +16,6 @@ long double calculate_single_term(int n, int x)
     double term = div * pow(pow_p1, pow_p2);
 
     return term;
-
 }
 
 long double calculate_term_process(int x, int start, int end)
@@ -26,19 +25,13 @@ long double calculate_term_process(int x, int start, int end)
     {
         process_total += calculate_single_term(i, x);
     }
-    cout << "El resultado parcial es:" <<  process_total << endl;
+
     return process_total;
-
 }
-
-
-
 
 int main()
 {
     int x = 1500000;
-
-
 
     if (MPI_Init(NULL, NULL) != MPI_SUCCESS)
     {
@@ -51,6 +44,10 @@ int main()
 
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    // start timer
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
 
     // Start Taylor
     cout << "\n Ejecutando Taylor con " << size << " procesos" << endl;
@@ -65,19 +62,20 @@ int main()
     // Sum all results
     MPI_Reduce(&local_result, &global_result, 1, MPI_LONG_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
 
-    // Print Result
-    if (rank == 0){
+    // Print Result and execution time
+    if (rank == 0)
+    {
+        gettimeofday(&end, NULL);
         cout << "El resultado es:" << 2.0 * global_result << endl;
+        cout << "Tiempo ejecución: " << double(end.tv_sec - start.tv_sec) + double(end.tv_usec - start.tv_usec) / 1000000 << endl;
     }
 
-
     // Close MPI
-    if(MPI_SUCCESS != MPI_Finalize())
+    if (MPI_SUCCESS != MPI_Finalize())
     {
         cout << "Error finalizing MPI" << endl;
         exit(1);
     }
-
 
     return 0;
 }

@@ -6,10 +6,8 @@
 
 using namespace std;
 
-const int n = 40;
+const int n = 300;
 const int t = 10;
-
-
 
 void imprimirMatriz(const vector<vector<float>> &matriz)
 {
@@ -23,17 +21,19 @@ void imprimirMatriz(const vector<vector<float>> &matriz)
     }
 }
 
-
-
-float* calculateRows(int start, int end, vector<vector<float>> matrixA, vector<vector<float>> matrixB) {
+float *calculateRows(int start, int end, vector<vector<float>> matrixA, vector<vector<float>> matrixB)
+{
     int n = matrixA.size();
     int size = end - start;
-    float* matrixC = new float[size*n];
+    float *matrixC = new float[size * n];
 
-    for (int i = start; i < end; i++) {
-        for (int j = 0; j < n; j++) {
-            for (int k = 0; k < n; k++) {
-                matrixC[(i-start)*n + j] += matrixA[i][k] * matrixB[k][j];
+    for (int i = start; i < end; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            for (int k = 0; k < n; k++)
+            {
+                matrixC[(i - start) * n + j] += matrixA[i][k] * matrixB[k][j];
             }
         }
     }
@@ -41,12 +41,12 @@ float* calculateRows(int start, int end, vector<vector<float>> matrixA, vector<v
     return matrixC;
 }
 
-void printResult(const vector<vector<float>> &matrix) {
+void printResult(const vector<vector<float>> &matrix)
+{
     // print the corners of the matrix
-    cout << "|" << matrix [0][0] << "..." << matrix[0][n-1] << "|" << endl;
+    cout << "|" << matrix[0][0] << "..." << matrix[0][n - 1] << "|" << endl;
     cout << "|............|" << endl;
-    cout << "|" << matrix [n-1][0] << "..." << matrix[n-1][n-1] << "|" << endl;
-
+    cout << "|" << matrix[n - 1][0] << "..." << matrix[n - 1][n - 1] << "|" << endl;
 
     // calculate the total
     float total = 0;
@@ -57,7 +57,7 @@ void printResult(const vector<vector<float>> &matrix) {
             total += matrix[i][j];
         }
     }
-    cout << "La suma de los elementos de la matriz es " <<total << endl;
+    cout << "La suma de los elementos de la matriz es " << total << endl;
 }
 
 int main()
@@ -75,17 +75,9 @@ int main()
         }
     }
 
-
-    // cout << "Tamaño de las matrices: " << n << "x" << n << endl;
-
-    // timeval time1, time2, time3;
-    // gettimeofday(&time1, NULL);
-
-    // cout << "\nCalculando multiplicación de matrices con un hilo" << endl;
-    // singleThread(matrixA, matrixB);
-    // gettimeofday(&time2, NULL);
-    // cout << "Tiempo ejecución: " << double(time2.tv_sec - time1.tv_sec) + double(time2.tv_usec - time1.tv_usec) / 1000000 << endl;
-
+    // start timer
+    struct timeval start, end;
+    gettimeofday(&start, NULL);
 
     // Star MPI
     if (MPI_Init(NULL, NULL) != MPI_SUCCESS)
@@ -101,28 +93,29 @@ int main()
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
     int fraction_number = n / size;
-    
+
     // Solve rows
     int i = rank;
 
-    float* matrixC =  calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
+    float *matrixC = calculateRows(i * fraction_number, (i + 1) * fraction_number, matrixA, matrixB);
     // printResult(matrixC);
 
     // Initialize global matrix with the same dimensions as matrixC
-    float* global_matrix = new float[n*n];
+    float *global_matrix = new float[n * n];
 
     // Gather
-    MPI_Gather(matrixC, fraction_number*n, MPI_FLOAT, global_matrix, fraction_number*n, MPI_FLOAT, 0, MPI_COMM_WORLD);
+    MPI_Gather(matrixC, fraction_number * n, MPI_FLOAT, global_matrix, fraction_number * n, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
     // Print result
-    if (rank == 0){
+    if (rank == 0)
+    {
         // Convert global matrix to vector
         float sum = 0.0;
         vector<vector<float>> global_matrix_vector(n, vector<float>(n));
-        for (int i = 0; i < n*n; i++)
+        for (int i = 0; i < n * n; i++)
         {
             sum += global_matrix[i];
-            global_matrix_vector[i/n][i%n] = global_matrix[i];
+            global_matrix_vector[i / n][i % n] = global_matrix[i];
         }
         cout << "La suma de los elementos de la matriz es " << sum << endl;
         printResult(global_matrix_vector);
@@ -130,8 +123,14 @@ int main()
 
     delete[] global_matrix;
 
+    // calculate and print execution time
+    if (rank == 0)
+    {
+        gettimeofday(&end, NULL);
+        cout << "Tiempo ejecución: " << double(end.tv_sec - start.tv_sec) + double(end.tv_usec - start.tv_usec) / 1000000 << endl;
+    }
     // Close MPI
-    if(MPI_SUCCESS != MPI_Finalize())
+    if (MPI_SUCCESS != MPI_Finalize())
     {
         cout << "Error finalizing MPI" << endl;
         exit(1);
